@@ -23,7 +23,7 @@ prefect server create-tenant --name default --slug default
 
 ## Run one or multiple agents
 
-Please open and edit the [`agent/.env`](./agent/.env) file. Then you can run :
+Please open and edit the [`agent/config.toml`](./agent/config.toml) file. Then you can run :
 
 You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/.env`](./agent/.env) file for that.
 
@@ -34,8 +34,15 @@ docker-compose -f agent/docker-compose.yml up -d
 Maybe you want to instanciate multiple agents automatically ?
 
 ```console
-docker-compose --scale agent=3 agent -f agent/docker-compose.yml up -d
+docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 ```
 
 ## Run your first flow via the Prefect API
 
+Please open the [`scripts/config.toml`](./scripts/config.toml) file and edit the IP to match your Prefect instance. Then you can run :
+
+```console
+docker-compose -f scripts/docker-compose.yml up
+```
+
+Now your flow is registered. You can access the UI to run some more flows.
