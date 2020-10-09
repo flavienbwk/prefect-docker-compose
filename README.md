@@ -11,7 +11,7 @@ All `PREFECT_SERVER_*` options are [explained in the official documentation](htt
 Please open and edit the [`server/.env`](./server/.env) file. Then you can run :
 
 ```console
-docker-compose up -d -f server/docker-compose.yml
+docker-compose -f server/docker-compose.yml up -d
 ```
 
 Then, on your host :
@@ -23,16 +23,19 @@ prefect server create-tenant --name default --slug default
 
 ## Run one or multiple agents
 
-Please open and edit the [`server/docker-compose.yml`](./server/docker-compose.yml) file. Then you can run :
+Please open and edit the [`agent/.env`](./agent/.env) file. Then you can run :
 
 You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/.env`](./agent/.env) file for that.
 
 ```console
-docker-compose up -d -f agent/docker-compose.yml
+docker-compose -f agent/docker-compose.yml up -d
 ```
 
 Maybe you want to instanciate multiple agents automatically ?
 
 ```console
-docker-compose up --scale agent=3 agent -d -f agent/docker-compose.yml
+docker-compose --scale agent=3 agent -f agent/docker-compose.yml up -d
 ```
+
+## Run your first flow via the Prefect API
+
