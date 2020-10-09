@@ -4,7 +4,7 @@ services:
 
     agent:
         build: .
-        command: bash -c "prefect agent start --name $$(uuid)"
+        command: bash -c "prefect agent start --name $$(uuid) --label development"
         volumes:
             - type: bind
               source: ./config.toml

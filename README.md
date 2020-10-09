@@ -41,3 +41,8 @@ docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 
 Please open the [`scripts/config.toml`](./scripts/config.toml) file and edit the IP to match your Prefect instance. Then you can run :
 
+```console
+docker-compose -f scripts/docker-compose.yml up
+```
+
+Now your flow is registered. You can access the UI to run some more flows.
