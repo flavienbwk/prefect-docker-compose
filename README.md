@@ -31,7 +31,7 @@ You can run the agent on another machine than the one with the Prefect server. E
 docker-compose up -d -f agent/docker-compose.yml
 ```
 
-Maybe you want to instanciate multiple agent automatically ?
+Maybe you want to instanciate multiple agents automatically ?
 
 ```console
 docker-compose up --scale agent=3 agent -d -f agent/docker-compose.yml
