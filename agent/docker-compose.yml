@@ -4,4 +4,5 @@ services:
 
     agent:
         build: .
-
+        environment: 
+            PREFECT_SERVER__APOLLO_URL: ${PREFECT_SERVER__APOLLO_URL}
