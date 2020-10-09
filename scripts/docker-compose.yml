@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+
+    weather:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                PREFECT_API_URL: ${PREFECT_API_URL}
+        command: python3 /usr/app/weather.py
+        env_file: 
+            - .env

@@ -39,3 +39,5 @@ docker-compose --scale agent=3 agent -f agent/docker-compose.yml up -d
 
 ## Run your first flow via the Prefect API
 
+Please open the [`scripts/.env`](./scripts/.env) file and edit the IP to match your Prefect instance. Then you can run :
+
