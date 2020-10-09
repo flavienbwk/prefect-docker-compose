@@ -3,11 +3,14 @@ version: "3.7"
 services:
 
     weather:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            args:
-                PREFECT_API_URL: ${PREFECT_API_URL}
+        build: .
         command: python3 /usr/app/weather.py
-        env_file: 
-            - .env
+        volumes:
+            - type: bind
+              source: ./weather.py
+              target: /usr/app/weather.py
+              read_only: true
+            - type: bind
+              source: ./config.toml
+              target: /root/.prefect/config.toml
+              read_only: true

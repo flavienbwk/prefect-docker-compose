@@ -4,5 +4,9 @@ services:
 
     agent:
         build: .
-        environment: 
-            PREFECT_SERVER__APOLLO_URL: ${PREFECT_SERVER__APOLLO_URL}
+        command: bash -c "prefect agent start --name $$(uuid)"
+        volumes:
+            - type: bind
+              source: ./config.toml
+              target: /root/.prefect/config.toml
+              read_only: true
