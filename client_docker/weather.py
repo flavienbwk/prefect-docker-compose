@@ -1,11 +1,12 @@
 # A simple example to demonstrate Prefect is working as expected
+# Works with a local folder shared with the agents (/root/.prefect/flows by default).
 
 import os
 import json
 import requests
 import prefect
 from prefect import Flow, task, Client
-#from prefect.environments.storage import Local
+from prefect.environments.storage import Docker
 
 logger = prefect.context.get("logger")
 
@@ -26,14 +27,21 @@ def get_weather(woeid: int):
     api_endpoint = "https://www.metaweather.com/api/location/{}".format(woeid)
     response = requests.get(api_endpoint)
     if response.status_code == 200:
-        return json.loads(response.text)
+        weather_data = json.loads(response.text)
+        logger.debug(weather_data)
+        return weather_data
     else:
         raise("Failed to query " + api_endpoint)
 
-with Flow("Get Paris' weather") as flow:
+with Flow(
+        "Get Paris' weather", 
+        storage=Docker(
+            registry_url=os.environ.get("DOCKER_REGISTRY_ENDPOINT"),
+            #dockerfile="/root/Dockerfile"
+        ),
+    ) as flow:
     woeid = get_woeid("Paris")
     weather_data = get_weather(woeid)
-    logger.debug(weather_data)
 
 try:
     client = Client()
@@ -41,7 +49,8 @@ try:
 except prefect.utilities.exceptions.ClientError as e:
     logger.info("Project already exists")
 
+flow.storage.build()
 flow.register(project_name="weather", labels=["development"])
 
-# Optionaly run the code now
+# Optionally run the code now
 flow.run()
