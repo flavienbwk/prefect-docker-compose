@@ -20,16 +20,18 @@ All `PREFECT_SERVER_*` options are [explained in the official documentation](htt
 
 Then you can run :
 
-```console
+```bash
 docker-compose -f server/docker-compose.yml up -d
 ```
 
-Then, on your host :
+Then we need to create a _tenant_. Execute on your host :
 
-```console
+```bash
 pip3 install prefect
 prefect server create-tenant --name default --slug default
 ```
+
+Access the UI at _localhost:8080_
 
 ## Run one or multiple agents
 
@@ -39,13 +41,13 @@ Open and edit the [`agent/config.toml`](./agent/config.toml) file. Then you can 
 
 You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/.env`](./agent/.env) file for that.
 
-```console
+```bash
 docker-compose -f agent/docker-compose.yml up -d
 ```
 
 Maybe you want to instanciate multiple agents automatically ?
 
-```console
+```bash
 docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 ```
 
@@ -55,7 +57,7 @@ docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 
 > [Execution in your cloud; orchestration in ours](https://medium.com/the-prefect-blog/the-prefect-hybrid-model-1b70c7fd296)
 
-This means the server never stores your code. It just orchestrates the running (optionally the scheduling) of it.
+This means the Prefect server never stores your code. It just orchestrates the running (optionally the scheduling) of it.
 
 1. When coding a flow, you need first to [**register it** to the Prefect server](./client/weather.py#L44). You can there say to the server that you want your flow to be run 3 times a day for example.
 2. You code never lies on the Prefect server : this means it has to store the code to be executed on an agent, somewhere the agent can access it.
@@ -72,29 +74,31 @@ This means the server never stores your code. It just orchestrates the running (
 
 Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance. Then you can run :
 
-```console
+```bash
 docker-compose -f client/docker-compose.yml up # Executes weather.py
 ```
 
-Now your flow is registered. You can access the UI to run some more flows.
+Now your flow is registered. You can access the UI to run it.
 
 ### Flow on S3 (recommended for distributed computing)
 
 We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 
-```console
+:warning: With this storage option, your agent must have the same environment (Dockerfile) than your client in order to execute the client's flow.
+
+```bash
 docker-compose -f client/docker-compose.yml up -d minio # Starts MinIO
 ```
 
-Go to _localhost:9000_ and with the red "+" button bottom right, create a new bucket named `prefect`.
+Go to _localhost:9000_ and clicking the red "+" button bottom right, create a new bucket named `prefect`.
 
 Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
 
-```console
+```bash
 docker-compose -f client/docker-compose.yml up # Starts MinIO and executes weather.py
 ```
 
-Now your flow is registered. You can access the UI to run some more flows.
+Now your flow is registered. You can access the UI to run it.
 
 ### Flow on Docker storage
 
@@ -104,8 +108,8 @@ This method requires our client AND agent containers to have access to Docker so
 
 Open the [`client_docker/config.toml`](./client_docker/config.toml) [`client_docker/docker-compose.yml`](client_docker/docker-compose.yml) files and edit the IP to match your Prefect instance. Then you can run :
 
-```console
+```bash
 docker-compose -f client_docker/docker-compose.yml up # Starts the Docker registry and executes weather.py
 ```
 
-Now your flow is registered. You can access the UI to run some more flows.
+Now your flow is registered. You can access the UI to run it.
