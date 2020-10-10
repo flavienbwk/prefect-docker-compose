@@ -1,0 +1,18 @@
+# debug mode
+debug = true
+
+# base configuration directory (typically you won't change this!)
+home_dir = "~/.prefect"
+
+backend = "server"
+
+[server]
+host = "http://192.168.254.1"
+port = "4200"
+host_port = "4200"
+endpoint = "${server.host}:${server.port}"
+
+[s3]
+endpoint = "192.168.254.1:9000"
+key = "minio"
+secret = "minio123"

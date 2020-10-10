@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+
+    registry:
+        restart: always
+        image: registry:2.7.1
+        ports:
+            - 5000:5000
+        volumes:
+            - /srv/docker/prefect/registry:/var/lib/registry
+
+    weather:
+        build: .
+        command: python3 /usr/app/weather.py
+        privileged: true # forced for Docker DinD
+        volumes:
+            - /srv/docker/prefect/flows:/root/.prefect/flows
+            - type: bind
+              source: ./weather.py
+              target: /usr/app/weather.py
+              read_only: true
+            - type: bind
+              source: ./config.toml
+              target: /root/.prefect/config.toml
+              read_only: true
+            - /var/run/docker.sock:/var/run/docker.sock
+        depends_on:
+            - registry
