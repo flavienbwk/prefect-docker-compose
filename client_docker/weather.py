@@ -36,8 +36,7 @@ def get_weather(woeid: int):
 with Flow(
         "Get Paris' weather", 
         storage=Docker(
-            registry_url=os.environ.get("DOCKER_REGISTRY_ENDPOINT"),
-            #dockerfile="/root/Dockerfile"
+            registry_url=os.environ.get("DOCKER_REGISTRY_ENDPOINT")
         ),
     ) as flow:
     woeid = get_woeid("Paris")
