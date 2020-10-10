@@ -2,19 +2,18 @@
 
 import os
 import json
-import time
 import requests
 import prefect
 from prefect import Flow, task, Client
+#from prefect.environments.storage import Local
 
 logger = prefect.context.get("logger")
 
 @task
 def get_woeid(city: str):
     logger.info("Getting {}'s woeid".format(city))
-    api_endpoint = "https://www.metaweather.com/api//location/search/?query={}".format(city)
+    api_endpoint = "https://www.metaweather.com/api/location/search/?query={}".format(city)
     response = requests.get(api_endpoint)
-    time.sleep(5)
     if response.status_code == 200:
         payload = json.loads(response.text)
         return payload[0]["woeid"]
@@ -26,7 +25,6 @@ def get_weather(woeid: int):
     logger.info("Getting weather of {}".format(woeid))
     api_endpoint = "https://www.metaweather.com/api/location/{}".format(woeid)
     response = requests.get(api_endpoint)
-    time.sleep(5)
     if response.status_code == 200:
         return json.loads(response.text)
     else:

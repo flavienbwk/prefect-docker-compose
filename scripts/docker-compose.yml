@@ -6,6 +6,7 @@ services:
         build: .
         command: python3 /usr/app/weather.py
         volumes:
+            - /srv/docker/prefect/flows:/root/.prefect/flows
             - type: bind
               source: ./weather.py
               target: /usr/app/weather.py
