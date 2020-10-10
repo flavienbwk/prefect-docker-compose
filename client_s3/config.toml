@@ -12,5 +12,7 @@ port = "4200"
 host_port = "4200"
 endpoint = "${server.host}:${server.port}"
 
-[registry]
-endpoint = "192.168.254.1:5000"
+[s3]
+endpoint = "192.168.254.1:9000"
+key = "minio"
+secret = "minio123"

@@ -25,7 +25,5 @@ services:
               target: /root/.prefect/config.toml
               read_only: true
             - /var/run/docker.sock:/var/run/docker.sock
-        environment:
-            DOCKER_REGISTRY_ENDPOINT: "192.168.254.1:5000"
         depends_on:
             - registry

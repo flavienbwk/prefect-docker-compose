@@ -9,12 +9,13 @@ This allows you to package your Prefect instance for Kubernetes or offline use.
   - [Run one or multiple agents](#run-one-or-multiple-agents)
   - [Run your first flow via the Prefect API](#run-your-first-flow-via-the-prefect-api)
     - [Principles to understand](#principles-to-understand)
-    - [Flow on Local storage](#flow-on-local-storage)
-    - [Flow on Docker storage (client only, no compatible agent in this repo)](#flow-on-docker-storage-client-only-no-compatible-agent-in-this-repo)
+    - [Flow on Local storage (recommended for a single machine)](#flow-on-local-storage-recommended-for-a-single-machine)
+    - [Flow on S3 (recommended for distributed computing)](#flow-on-s3-recommended-for-distributed-computing)
+    - [Flow on Docker storage](#flow-on-docker-storage)
 
 ## Run the server
 
-Please open and edit the [`server/.env`](./server/.env) file.  
+Open and edit the [`server/.env`](./server/.env) file.  
 All `PREFECT_SERVER_*` options are [explained in the official documentation](https://docs.prefect.io/core/concepts/configuration.html#environment-variables) and [listed in the `config.toml` file](https://github.com/PrefectHQ/prefect/blob/master/src/prefect/config.toml).
 
 Then you can run :
@@ -34,7 +35,7 @@ prefect server create-tenant --name default --slug default
 
 Agents are services that run your scheduled flows.
 
-Please open and edit the [`agent/config.toml`](./agent/config.toml) file. Then you can run :
+Open and edit the [`agent/config.toml`](./agent/config.toml) file. Then you can run :
 
 You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/.env`](./agent/.env) file for that.
 
@@ -62,12 +63,14 @@ This means the server never stores your code. It just orchestrates the running (
     Prefect has [a lot of storage options](https://docs.prefect.io/orchestration/execution/storage_options.html) but the most important are : Local and Docker.
 
     - Local : saves the flows to be run on disk. So the volume where you save the flows must be [shared among your client and your agent(s)](./client/docker-compose.yml#L9). Requires your agent to have ALL the dependencies of your client script installed (imports pip-installed).
-    - S3 : saves the flows to be run in S3 objects.
+    - S3 : similar to local, but saves the flows to be run in S3 objects.
     - Docker : saves the flows to be run as Docker images to your Docker Registry so your agents can easily run the code.
 
-### Flow on Local storage
+### Flow on Local storage (recommended for a single machine)
 
-Please open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance. Then you can run :
+:warning: With this storage option, your agent must have the same environment (Dockerfile) than your client in order to execute the client's flow.
+
+Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance. Then you can run :
 
 ```console
 docker-compose -f client/docker-compose.yml up # Executes weather.py
@@ -75,14 +78,34 @@ docker-compose -f client/docker-compose.yml up # Executes weather.py
 
 Now your flow is registered. You can access the UI to run some more flows.
 
-### Flow on Docker storage (client only, no compatible agent in this repo)
+### Flow on S3 (recommended for distributed computing)
+
+We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
+
+```console
+docker-compose -f client/docker-compose.yml up -d minio # Starts MinIO
+```
+
+Go to _localhost:9000_ and with the red "+" button bottom right, create a new bucket named `prefect`.
+
+Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
+
+```console
+docker-compose -f client/docker-compose.yml up # Starts MinIO and executes weather.py
+```
+
+Now your flow is registered. You can access the UI to run some more flows.
+
+### Flow on Docker storage
+
+:warning: Client example only. The [agent](./agent) example in this repo doesn't include Docker in Docker for the moment, so it can't work with this client flow. You can inspire yourself from [this client's Dockerfile](./client_docker/Dockerfile) to create an agent able to execute Docker images.
 
 This method requires our client AND agent containers to have access to Docker so they can package or load the image in which the flow will be executed. We use Docker in Docker for that.
 
-Please open the [`client_docker/config.toml`](./client_docker/config.toml) [`client_docker/docker-compose.yml`](client_docker/docker-compose.yml) files and edit the IP to match your Prefect instance. Then you can run :
+Open the [`client_docker/config.toml`](./client_docker/config.toml) [`client_docker/docker-compose.yml`](client_docker/docker-compose.yml) files and edit the IP to match your Prefect instance. Then you can run :
 
 ```console
-docker-compose -f client_docker/docker-compose.yml up # Executes weather.py
+docker-compose -f client_docker/docker-compose.yml up # Starts the Docker registry and executes weather.py
 ```
 
 Now your flow is registered. You can access the UI to run some more flows.
