@@ -1,8 +1,10 @@
 # Prefect - Docker Compose
 
-Make Prefect work with your own simple docker-compose configuration.
+A simple guide to understand and make Prefect work with your own docker-compose configuration.
 
 This allows you to package your Prefect instance for Kubernetes or offline use.
+
+![Operating principle of Prefect](./prefect_schema_principle.jpg)
 
 - [Prefect - Docker Compose](#prefect---docker-compose)
   - [Run the server](#run-the-server)
