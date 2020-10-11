@@ -89,7 +89,7 @@ We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 :warning: With this storage option, your agent must have the same environment (Dockerfile) than your client in order to execute the client's flow.
 
 ```bash
-docker-compose -f client/docker-compose.yml up -d minio # Starts MinIO
+docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
 ```
 
 Go to _localhost:9000_ and clicking the red "+" button bottom right, create a new bucket named `prefect`.
@@ -97,7 +97,7 @@ Go to _localhost:9000_ and clicking the red "+" button bottom right, create a ne
 Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
 
 ```bash
-docker-compose -f client/docker-compose.yml up # Starts MinIO and executes weather.py
+docker-compose -f client_s3/docker-compose.yml up weather # Executes weather.py
 ```
 
 Now your flow is registered. You can access the UI to run it.
