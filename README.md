@@ -11,8 +11,8 @@ This allows you to package your Prefect instance for Kubernetes or offline use.
   - [Run one or multiple agents](#run-one-or-multiple-agents)
   - [Run your first flow via the Prefect API](#run-your-first-flow-via-the-prefect-api)
     - [Principles to understand](#principles-to-understand)
-    - [Flow on Local storage (recommended for a single machine)](#flow-on-local-storage-recommended-for-a-single-machine)
-    - [Flow on S3 (recommended for distributed computing)](#flow-on-s3-recommended-for-distributed-computing)
+    - [Flow on Local storage (recommended)](#flow-on-local-storage-recommended)
+    - [Flow on S3](#flow-on-s3)
     - [Flow on Docker storage](#flow-on-docker-storage)
 
 ## Run the server
@@ -66,13 +66,13 @@ This means the Prefect server never stores your code. It just orchestrates the r
 
     Prefect has [a lot of storage options](https://docs.prefect.io/orchestration/execution/storage_options.html) but the most important are : Local and Docker.
 
-    - Local : saves the flows to be run on disk. So the volume where you save the flows must be [shared among your client and your agent(s)](./client/docker-compose.yml#L9). Requires your agent to have ALL the dependencies of your client script installed (imports pip-installed).
+    - Local : saves the flows to be run on disk. So the volume where you save the flows must be [shared among your client and your agent(s)](./client/docker-compose.yml#L9). Requires your agent to have the same environment than your client (Python modules, packages installed etc... (the same Dockerfile if your agent and client are containers))
     - S3 : similar to local, but saves the flows to be run in S3 objects.
     - Docker : saves the flows to be run as Docker images to your Docker Registry so your agents can easily run the code.
 
-### Flow on Local storage (recommended for a single machine)
+### Flow on Local storage (recommended)
 
-:warning: With this storage option, your agent must have the same environment (Dockerfile) than your client in order to execute the client's flow.
+:information_source: If your agents are installed among multiple machines, I recommend you to mount a shared directory with SSHFS.
 
 Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance. Then you can run :
 
@@ -82,11 +82,11 @@ docker-compose -f client/docker-compose.yml up # Executes weather.py
 
 Now your flow is registered. You can access the UI to run it.
 
-### Flow on S3 (recommended for distributed computing)
+### Flow on S3
+
+:warning: I don't recommend this method if you plan to schedule a lot of flows every minute. MinIO times out regurarly in that case (maybe AWS wouldn't).
 
 We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
-
-:warning: With this storage option, your agent must have the same environment (Dockerfile) than your client in order to execute the client's flow.
 
 ```bash
 docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
