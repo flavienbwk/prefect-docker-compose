@@ -61,10 +61,10 @@ docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 
 This means the Prefect server never stores your code. It just orchestrates the running (optionally the scheduling) of it.
 
-1. When coding a flow, you need first to [**register it** to the Prefect server](./client/weather.py#L44). You can there say to the server that you want your flow to be run 3 times a day for example.
-2. You code never lies on the Prefect server : this means it has to store the code to be executed on an agent, somewhere the agent can access it.
+1. When coding a flow, you need first to [**register it** to the Prefect server](./client/weather.py#L44) through a script. In that script, you may ask the server to run your flow 3 times a day, for example.
+2. Your code never lies on the Prefect server : this means the code has to be stored somewhere accessible to the agents in order to be executed.
 
-    Prefect has [a lot of storage options](https://docs.prefect.io/orchestration/execution/storage_options.html) but the most important are : Local and Docker.
+    Prefect has [a lot of storage options](https://docs.prefect.io/orchestration/execution/storage_options.html) but the most famous are : Local, S3 and Docker.
 
     - Local : saves the flows to be run on disk. So the volume where you save the flows must be [shared among your client and your agent(s)](./client/docker-compose.yml#L9). Requires your agent to have the same environment than your client (Python modules, packages installed etc... (the same Dockerfile if your agent and client are containers))
     - S3 : similar to local, but saves the flows to be run in S3 objects.
