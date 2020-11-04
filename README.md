@@ -30,6 +30,7 @@ Then we need to create a _tenant_. Execute on your host :
 
 ```bash
 pip3 install prefect
+prefect backend server
 prefect server create-tenant --name default --slug default
 ```
 
