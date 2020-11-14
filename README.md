@@ -54,7 +54,7 @@ Then you can run :
 docker-compose -f agent/docker-compose.yml up -d
 ```
 
-> :information_source: You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/.env`](./agent/.env) file for that.
+> :information_source: You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/config.toml`](./agent/config.toml) file for that.
 
 Maybe you want to instanciate multiple agents automatically ?
 
