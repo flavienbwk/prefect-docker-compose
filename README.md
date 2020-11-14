@@ -113,7 +113,7 @@ Now your flow is registered. You can access the UI to run it.
 
 ### Flow on Docker storage
 
-:warning: Client example only. The [agent](./agent) example in this repo doesn't include Docker in Docker for the moment, so it can't work with this client flow. You can inspire yourself from [this client's Dockerfile](./client_docker/Dockerfile) to create an agent able to execute Docker images.
+:warning: Client example only. The [agent](./agent) example in this repo doesn't include Docker in Docker for the moment, so it can't work with this client flow. You can inspire yourself from [the client's Dockerfile](./client_docker/Dockerfile) to create an agent able to execute Docker images.
 
 This method requires our client AND agent containers to have access to Docker so they can package or load the image in which the flow will be executed. We use Docker in Docker for that.
 
