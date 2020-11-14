@@ -40,13 +40,21 @@ Access the UI at _localhost:8080_
 
 Agents are services that run your scheduled flows.
 
-Open and edit the [`agent/config.toml`](./agent/config.toml) file. Then you can run :
+Open and edit the [`agent/config.toml`](./agent/config.toml) file.
 
-You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/.env`](./agent/.env) file for that.
+> :information_source: In each `config.toml`, you will find the `172.17.0.1` IP address. This is the IP of the Docker daemon on which are exposed all exposed ports of your containers. This allows   containers on launched from different docker-compose networks to communicate. Change it if yours is different (check your daemon IP by typing `ip a | grep docker0`).
+> 
+> ![Docker interface IP](./docker_interface.png)
+> 
+> Here, mine is `192.168.254.1` but the default is generally to `172.17.0.1`.
+
+Then you can run :
 
 ```bash
 docker-compose -f agent/docker-compose.yml up -d
 ```
+
+> :information_source: You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/.env`](./agent/.env) file for that.
 
 Maybe you want to instanciate multiple agents automatically ?
 
@@ -58,7 +66,7 @@ docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 
 ### Principles to understand
 
-> [Execution in your cloud; orchestration in ours](https://medium.com/the-prefect-blog/the-prefect-hybrid-model-1b70c7fd296)
+> :speech_balloon: [Execution in your cloud; orchestration in ours](https://medium.com/the-prefect-blog/the-prefect-hybrid-model-1b70c7fd296)
 
 This means the Prefect server never stores your code. It just orchestrates the running (optionally the scheduling) of it.
 
