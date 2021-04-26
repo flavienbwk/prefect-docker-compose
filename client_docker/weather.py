@@ -1,7 +1,6 @@
 # A simple example to demonstrate Prefect is working as expected
 # Works with a local folder shared with the agents (/root/.prefect/flows by default).
 
-import os
 import json
 import requests
 import prefect

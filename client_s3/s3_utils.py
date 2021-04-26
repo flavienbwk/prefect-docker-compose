@@ -1,11 +1,6 @@
 # based on https://raw.githubusercontent.com/kneufeld/minio-put/master/minio-put.py
 
-import os
-import sys
-import glob
-import argparse
 import datetime
-import urllib.request
 
 def get_headers(method, key, secret, host, bucket, file_name):
     resource     = f"/{bucket}/{file_name}"
