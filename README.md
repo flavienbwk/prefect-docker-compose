@@ -52,7 +52,7 @@ prefect backend server
 prefect server create-tenant --name default --slug default
 ```
 
-Access the UI at _localhost:8080_
+Access the UI at [localhost:8080](http://localhost:8080)
 
 ## Run one or multiple agents
 
@@ -119,7 +119,7 @@ We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
 ```
 
-Go to _localhost:9000_ and clicking the red "+" button bottom right, create a new bucket named `prefect`.
+Go to [localhost:9000](http://localhost:9000) create a new **bucket** named `prefect` by clicking the red "+" button bottom right.
 
 Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
 
