@@ -4,7 +4,7 @@ services:
 
     agent:
         build: .
-        command: bash -c "prefect agent start --name $$(uuid) --label development"
+        command: bash -c "prefect agent local start --name $$(uuid) --no-hostname-label --label development"
         volumes:
             - /srv/docker/prefect/flows:/root/.prefect/flows
             - type: bind
