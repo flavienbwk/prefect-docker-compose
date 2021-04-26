@@ -8,21 +8,24 @@ import s3_utils
 
 import prefect
 from prefect import Flow, task, Client, config
-from prefect.environments import LocalEnvironment
 from prefect.environments.storage import Webhook
 
 logger = prefect.context.get("logger")
 
+
 @task
 def get_woeid(city: str):
     logger.info("Getting {}'s woeid".format(city))
-    api_endpoint = "https://www.metaweather.com/api/location/search/?query={}".format(city)
+    api_endpoint = "https://www.metaweather.com/api/location/search/?query={}".format(
+        city
+    )
     response = requests.get(api_endpoint)
     if response.status_code == 200:
         payload = json.loads(response.text)
         return payload[0]["woeid"]
     else:
-        raise("Failed to query " + api_endpoint)
+        raise ("Failed to query " + api_endpoint)
+
 
 @task
 def get_weather(woeid: int):
@@ -34,10 +37,11 @@ def get_weather(woeid: int):
         logger.debug(weather_data)
         return weather_data
     else:
-        raise("Failed to query " + api_endpoint)
+        raise ("Failed to query " + api_endpoint)
+
 
 # Webhook for Minio S3 upload and download
-s3_bucket = "prefect" # previously created (in README.md)
+s3_bucket = "prefect"  # previously created (in README.md)
 s3_flow_filename = uuid.uuid4()
 s3_headers_upload = s3_utils.get_headers(
     method="PUT",
@@ -45,7 +49,7 @@ s3_headers_upload = s3_utils.get_headers(
     secret=config.s3.secret,
     host=config.s3.endpoint,
     bucket=s3_bucket,
-    file_name=s3_flow_filename
+    file_name=s3_flow_filename,
 )
 s3_headers_download = s3_utils.get_headers(
     method="GET",
@@ -53,23 +57,28 @@ s3_headers_download = s3_utils.get_headers(
     secret=config.s3.secret,
     host=config.s3.endpoint,
     bucket=s3_bucket,
-    file_name=s3_flow_filename
+    file_name=s3_flow_filename,
 )
 with Flow(
-        "Get Paris' weather",
-        storage=Webhook(
-            build_request_kwargs={
-                "url": "http://{}/{}/{}".format(config.s3.endpoint, s3_bucket, s3_flow_filename),
-                "headers": s3_headers_upload
-            },
-            build_request_http_method="PUT",
-            get_flow_request_kwargs={
-                "url": "http://{}/{}/{}".format(config.s3.endpoint, s3_bucket, s3_flow_filename),
-                "headers": s3_headers_download
-            },
-            get_flow_request_http_method="GET",
-        )
-    ) as flow:
+    "Get Paris' weather",
+    storage=Webhook(
+        build_request_kwargs={
+            "url": "http://{}/{}/{}".format(
+                config.s3.endpoint, s3_bucket, s3_flow_filename
+            ),
+            "headers": s3_headers_upload,
+        },
+        build_request_http_method="PUT",
+        get_flow_request_kwargs={
+            "url": "http://{}/{}/{}".format(
+                config.s3.endpoint, s3_bucket, s3_flow_filename
+            ),
+            "headers": s3_headers_download,
+        },
+        get_flow_request_http_method="GET",
+        add_default_labels=False,
+    ),
+) as flow:
     woeid = get_woeid("Paris")
     weather_data = get_weather(woeid)
 
