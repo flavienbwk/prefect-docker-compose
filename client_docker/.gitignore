@@ -1,0 +1,2 @@
+registry/auth/*
+!registry/auth/.gitkeep

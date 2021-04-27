@@ -1,0 +1,13 @@
+# debug mode
+debug = true
+
+# base configuration directory (typically you won't change this!)
+home_dir = "~/.prefect"
+
+backend = "server"
+
+[server]
+host = "http://172.17.0.1"
+port = "4200"
+host_port = "4200"
+endpoint = "${server.host}:${server.port}"

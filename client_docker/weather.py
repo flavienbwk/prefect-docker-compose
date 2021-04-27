@@ -4,7 +4,7 @@
 import json
 import requests
 import prefect
-from prefect import Flow, task, Client, config
+from prefect import Flow, task, Client
 from prefect.environments.storage import Docker
 
 logger = prefect.context.get("logger")
@@ -21,7 +21,7 @@ def get_woeid(city: str):
         payload = json.loads(response.text)
         return payload[0]["woeid"]
     else:
-        raise ("Failed to query " + api_endpoint)
+        raise Exception("Failed to query " + api_endpoint)
 
 
 @task
@@ -34,27 +34,29 @@ def get_weather(woeid: int):
         logger.debug(weather_data)
         return weather_data
     else:
-        raise ("Failed to query " + api_endpoint)
+        raise Exception("Failed to query " + api_endpoint)
 
 
 with Flow(
     "Get Paris' weather",
     storage=Docker(
-        registry_url=config.server.registry.endpoint,
-        add_default_labels=False,
+        base_url="unix:///var/run/docker.sock",
+        registry_url="172.17.0.1:5000",
+        base_image="172.17.0.1:5000/weather/base_image:latest",
+        ignore_healthchecks=True
     ),
 ) as flow:
     woeid = get_woeid("Paris")
     weather_data = get_weather(woeid)
 
-try:
-    client = Client()
-    client.create_project(project_name="weather")
-except prefect.utilities.exceptions.ClientError as e:
-    logger.info("Project already exists")
+if __name__ == "__main__":
+    try:
+        client = Client()
+        client.create_project(project_name="weather")
+    except prefect.utilities.exceptions.ClientError as e:
+        logger.info("Project already exists")
 
-flow.storage.build()
-flow.register(project_name="weather", labels=["development"])
+    flow.register(project_name="weather", labels=["development"])
 
-# Optionally run the code now
-flow.run()
+    # Optionally run the code now
+    flow.run()
