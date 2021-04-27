@@ -14,8 +14,8 @@ This allows you to package your Prefect instance for Kubernetes or offline use.
     - [Flow with Local storage (easiest)](#flow-with-local-storage-easiest)
     - [Flow with S3 Storage](#flow-with-s3-storage)
     - [Flow with Docker storage](#flow-with-docker-storage)
-      - [Start the Docker in Docker agents](#start-the-docker-in-docker-agents)
       - [Preparing the Registry](#preparing-the-registry)
+      - [Start the Docker in Docker agents](#start-the-docker-in-docker-agents)
       - [Registering the flow](#registering-the-flow)
 
 ## Run the server
@@ -145,14 +145,6 @@ This method requires our client AND agent containers to have access to Docker so
 <details>
 <summary>Tutorial for (secure) Docker Storage</summary>
 
-#### Start the Docker in Docker agents
-
-Edit registry credentials in `./agent_docker/docker-compose.yml` and run :
-
-```bash
-docker-compose -f agent_docker/docker-compose.yml up -d
-```
-
 #### Preparing the Registry
 
 A Docker Registry is needed in order to save images that are going to be used by our agents.
@@ -191,6 +183,14 @@ A Docker Registry is needed in order to save images that are going to be used by
   ```
 
   You should see : _Login Succeeded_
+
+#### Start the Docker in Docker agents
+
+Edit registry credentials in `./agent_docker/docker-compose.yml` and run :
+
+```bash
+docker-compose -f agent_docker/docker-compose.yml up -d
+```
 
 #### Registering the flow
 
