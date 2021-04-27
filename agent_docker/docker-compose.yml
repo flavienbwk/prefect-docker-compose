@@ -1,0 +1,23 @@
+version: "3.7"
+
+services:
+
+    agent:
+        build: .
+        privileged: true # forced for Docker DinD
+        entrypoint: ["/bin/sh", "-c"]
+        command: 
+          - |
+            docker login -u=myusername -p=test http://172.17.0.1:5000 
+            prefect agent docker start --name $$(uuidgen) --label development --no-docker-interface
+            # --no-docker-interface due to https://github.com/PrefectHQ/prefect/issues/2781
+        volumes:
+            - /srv/docker/prefect/flows:/root/.prefect/flows
+            - type: bind
+              source: ./config.toml
+              target: /root/.prefect/config.toml
+              read_only: true
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+              read_only: true

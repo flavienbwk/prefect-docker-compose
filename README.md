@@ -14,6 +14,9 @@ This allows you to package your Prefect instance for Kubernetes or offline use.
     - [Flow on Local storage (recommended)](#flow-on-local-storage-recommended)
     - [Flow on S3](#flow-on-s3)
     - [Flow on Docker storage](#flow-on-docker-storage)
+      - [Start the Docker in Docker agents](#start-the-docker-in-docker-agents)
+      - [Preparing the Registry](#preparing-the-registry)
+      - [Registering the flow](#registering-the-flow)
 
 ## Run the server
 
@@ -60,7 +63,7 @@ Agents are services that run your scheduled flows.
 
 Open and edit the [`agent/config.toml`](./agent/config.toml) file.
 
-> :information_source: In each `config.toml`, you will find the `172.17.0.1` IP address. This is the IP of the Docker daemon on which are exposed all exposed ports of your containers. This allows   containers on launched from different docker-compose networks to communicate. Change it if yours is different (check your daemon IP by typing `ip a | grep docker0`).
+> :information_source: In each `config.toml`, you will find the `172.17.0.1` IP address. This is the IP of the Docker daemon on which are exposed all exposed ports of your containers. This allows containers launched from different docker-compose networks to communicate. Change it if yours is different (check your daemon IP by typing `ip a | grep docker0`).
 > 
 > ![Docker interface IP](./docker_interface.png)
 > 
@@ -88,7 +91,7 @@ docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 
 This means the Prefect server never stores your code. It just orchestrates the running (optionally the scheduling) of it.
 
-1. When coding a flow, you need first to [**register it** to the Prefect server](./client/weather.py#L44) through a script. In that script, you may ask the server to run your flow 3 times a day, for example.
+1. When coding a flow, you need first to [**register it** to the Prefect server](./client/weather.py#L50) through a script. In that script, you may ask the server to run your flow 3 times a day, for example.
 2. Your code never lies on the Prefect server : this means the code has to be stored somewhere accessible to the agents in order to be executed.
 
     Prefect has [a lot of storage options](https://docs.prefect.io/orchestration/execution/storage_options.html) but the most famous are : Local, S3 and Docker.
@@ -131,14 +134,77 @@ Now your flow is registered. You can access the UI to run it.
 
 ### Flow on Docker storage
 
-:warning: Client example only. The [agent](./agent) example in this repo doesn't include Docker in Docker for the moment, so it can't work with this client flow. You can inspire yourself from [the client's Dockerfile](./client_docker/Dockerfile) to create an agent able to execute Docker images.
+This method requires our client AND agent containers to have access to Docker so they can package or load the image in which the flow will be executed. We use _Docker in Docker_ for that.
 
-This method requires our client AND agent containers to have access to Docker so they can package or load the image in which the flow will be executed. We use Docker in Docker for that.
+#### Start the Docker in Docker agents
 
-Open the [`client_docker/config.toml`](./client_docker/config.toml) [`client_docker/docker-compose.yml`](client_docker/docker-compose.yml) files and edit the IP to match your Prefect instance. Then you can run :
+Edit registry credentials in `./agent_docker/docker-compose.yml` and run :
 
 ```bash
-docker-compose -f client_docker/docker-compose.yml up # Starts the Docker registry and executes weather.py
+docker-compose -f agent_docker/docker-compose.yml up -d
 ```
+
+#### Preparing the Registry
+
+A Docker Registry is needed in order to save images that are going to be used by our agents.
+
+1. Open the [`client_docker/config.toml`](./client_docker/config.toml) [`client_docker/docker-compose.yml`](client_docker/docker-compose.yml) files and edit the IP to match your Prefect instance.
+
+2. Generate the authentication credentials for our registry
+
+  ```bash
+  sudo apt install apache2-utils # required to generate basic_auth credentials
+  cd client_docker/registry/auth && htpasswd -B -c .htpasswd myusername && cd -
+  ```
+
+  > To add more users, re-run the previous command **without** the -c option
+
+3. Start the registry
+
+  ```bash
+  docker-compose -f client_docker/docker-compose.yml up -d registry
+  ```
+
+4. Login to the registry
+
+  You need to allow your Docker daemon to push to this registry. Insert this in your `/etc/docker/daemon.json` (create if needed) :
+
+  ```json
+  {
+    "insecure-registries": ["172.17.0.1:5000"]
+  }
+  ```
+
+  Then, run :
+
+  ```bash
+  docker login http://172.17.0.1:5000 # with myusername and the password you typed
+  ```
+
+  You should see : _Login Succeeded_
+
+#### Registering the flow
+
+We're going to push our Docker image with Python dependencies and register our flow.
+
+1. Build, tag and push the image
+
+  ```bash
+  docker build . -f ./client_docker/execution.Dockerfile -t 172.17.0.1:5000/weather/base_image
+  ```
+
+  > You **must** prefix your image by the registry URI `172.17.0.1`
+
+  ```bash
+  docker push 172.17.0.1:5000/weather/base_image
+  ```
+
+2. Register the flow
+
+  Edit registry credentials in `./client_docker/docker-compose.yml` and run :
+
+  ```bash
+  docker-compose -f ./client_docker/docker-compose.yml up weather
+  ```
 
 Now your flow is registered. You can access the UI to run it.
