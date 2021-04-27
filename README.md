@@ -11,9 +11,9 @@ This allows you to package your Prefect instance for Kubernetes or offline use.
   - [Run one or multiple agents](#run-one-or-multiple-agents)
   - [Run your first flow via the Prefect API](#run-your-first-flow-via-the-prefect-api)
     - [Principles to understand](#principles-to-understand)
-    - [Flow on Local storage (recommended)](#flow-on-local-storage-recommended)
-    - [Flow on S3](#flow-on-s3)
-    - [Flow on Docker storage](#flow-on-docker-storage)
+    - [Flow with Local storage (easiest)](#flow-with-local-storage-easiest)
+    - [Flow with S3 Storage](#flow-with-s3-storage)
+    - [Flow with Docker storage](#flow-with-docker-storage)
       - [Start the Docker in Docker agents](#start-the-docker-in-docker-agents)
       - [Preparing the Registry](#preparing-the-registry)
       - [Registering the flow](#registering-the-flow)
@@ -100,7 +100,7 @@ This means the Prefect server never stores your code. It just orchestrates the r
     - S3 : similar to local, but saves the flows to be run in S3 objects.
     - Docker : saves the flows to be run as Docker images to your Docker Registry so your agents can easily run the code.
 
-### Flow on Local storage (recommended)
+### Flow with Local storage (easiest)
 
 :information_source: If your agents are installed among multiple machines, I recommend you to mount a shared directory with SSHFS.
 
@@ -112,9 +112,13 @@ docker-compose -f client/docker-compose.yml up # Executes weather.py
 
 Now your flow is registered. You can access the UI to run it.
 
-### Flow on S3
+### Flow with S3 Storage
 
 :warning: I don't recommend this method if you plan to schedule a lot of flows every minute. MinIO times out regurarly in that case (maybe AWS wouldn't).
+
+<details>
+<summary>Tutorial for S3 Storage</summary>
+<br/>
 
 We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 
@@ -122,19 +126,24 @@ We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
 ```
 
-Go to [localhost:9000](http://localhost:9000) create a new **bucket** named `prefect` by clicking the red "+" button bottom right.
+1. Go to [localhost:9000](http://localhost:9000) create a new **bucket** named `prefect` by clicking the red **(+)** button bottom right.
 
-Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
+2. Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
 
-```bash
-docker-compose -f client_s3/docker-compose.yml up weather # Executes weather.py
-```
+  ```bash
+  docker-compose -f client_s3/docker-compose.yml up weather # Executes weather.py
+  ```
 
 Now your flow is registered. You can access the UI to run it.
 
-### Flow on Docker storage
+</details>
+
+### Flow with Docker storage
 
 This method requires our client AND agent containers to have access to Docker so they can package or load the image in which the flow will be executed. We use _Docker in Docker_ for that.
+
+<details>
+<summary>Tutorial for (secure) Docker Storage</summary>
 
 #### Start the Docker in Docker agents
 
@@ -208,3 +217,5 @@ We're going to push our Docker image with Python dependencies and register our f
   ```
 
 Now your flow is registered. You can access the UI to run it.
+
+</details>
