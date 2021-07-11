@@ -3,8 +3,15 @@ version: "3.7"
 services:
 
     agent:
-        build: .
-        command: bash -c "prefect agent local start --name $$(uuid) --no-hostname-label --label development"
+        image: prefect_agent:${PREFECT_CORE_VERSION}
+        container_name: prefect_agent
+        network_mode: host
+        build:
+          context: .
+          dockerfile: Dockerfile
+          args:
+            PREFECT_CORE_VERSION: ${PREFECT_CORE_VERSION} 
+        command: bash -c "prefect server create-tenant --name ${PREFECT_TENANT_NAME} --slug ${PREFECT_TENANT_SLUG}; prefect agent local start --name $$(uuid) --no-hostname-label --label development"
         volumes:
             - /srv/docker/prefect/flows:/root/.prefect/flows
             - type: bind
