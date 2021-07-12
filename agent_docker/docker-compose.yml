@@ -1,16 +1,19 @@
 version: "3.7"
 
 services:
-
     agent:
-        build: .
+        image: prefect_agent:${PREFECT_CORE_VERSION}
+        container_name: prefect_agent
+        network_mode: host
+        build:
+          context: .
+          dockerfile: Dockerfile
+          args:
+            PREFECT_CORE_VERSION: ${PREFECT_CORE_VERSION} 
         privileged: true # forced for Docker DinD
         entrypoint: ["/bin/sh", "-c"]
-        command: 
-          - |
-            docker login -u=myusername -p=test http://172.17.0.1:5000 
-            prefect agent docker start --name $$(uuidgen) --label development --no-docker-interface
-            # --no-docker-interface due to https://github.com/PrefectHQ/prefect/issues/2781
+        command: docker login -u=${REGISTRY_USER} -p=${REGISTRY_PASSWORD} ${REGISRTRY_URL}; prefect server create-tenant --name ${PREFECT_TENANT_NAME} --slug ${PREFECT_TENANT_SLUG}; prefect agent docker start --name $$(uuidgen) --label development --no-docker-interface
+        # --no-docker-interface due to https://github.com/PrefectHQ/prefect/issues/2781
         volumes:
             - /srv/docker/prefect/flows:/root/.prefect/flows
             - type: bind

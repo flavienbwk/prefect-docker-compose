@@ -7,7 +7,6 @@ home_dir = "~/.prefect"
 backend = "server"
 
 [server]
-host = "http://172.17.0.1"
+host = "http://192.168.0.104"
 port = "4200"
-host_port = "4200"
 endpoint = "${server.host}:${server.port}"
