@@ -83,7 +83,7 @@ services:
       graphql:
         condition: service_started
     environment:
-      PREFECT_SERVER__HASURA__ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      PREFECT_SERVER__HASURA__ADMIN_SECRET: ${PREFECT_SERVER__HASURA__ADMIN_SECRET:-hasura-secret-admin-secret} 
       PREFECT_SERVER__HASURA__HOST: hasura
     image: prefecthq/server:core-1.2.0
     networks:
