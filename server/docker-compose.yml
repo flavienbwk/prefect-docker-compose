@@ -63,7 +63,7 @@ services:
       PREFECT_CORE_VERSION: 1.2.0
       PREFECT_SERVER_DB_CMD: prefect-server database upgrade -y
       PREFECT_SERVER__DATABASE__CONNECTION_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      PREFECT_SERVER__HASURA__ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      PREFECT_SERVER__HASURA__ADMIN_SECRET: ${PREFECT_SERVER__HASURA__ADMIN_SECRET:-hasura-secret-admin-secret}
       PREFECT_SERVER__HASURA__HOST: hasura
     healthcheck:
       interval: 20s
