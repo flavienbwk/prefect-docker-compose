@@ -219,3 +219,8 @@ We're going to push our Docker image with Python dependencies and register our f
 Now your flow is registered. You can access the UI to run it.
 
 </details>
+
+
+### Infrastructure model
+
+![Infrastructure model](.infragenie/infrastructure_model.png)
