@@ -4,4 +4,4 @@ ENV TZ="Europe/Paris"
 USER root
 RUN apk update && apk add python3 python3-dev py3-pip gcc linux-headers musl-dev util-linux
 
-RUN pip3 install prefect==1.2.2
+RUN pip3 install prefect==2.3.2

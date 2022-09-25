@@ -2,7 +2,7 @@
 
 A simple guide to understand and make Prefect work with your own docker-compose configuration.
 
-This allows you to package your Prefect instance for Kubernetes or offline use.
+This allows you to package your Prefect instance for fully-containerized environments (e.g: docker-compose, Kubernetes) or offline use.
 
 ![Operating principle of Prefect](./prefect_schema_principle.jpg)
 
@@ -12,76 +12,55 @@ This allows you to package your Prefect instance for Kubernetes or offline use.
   - [Run your first flow via the Prefect API](#run-your-first-flow-via-the-prefect-api)
     - [Principles to understand](#principles-to-understand)
     - [Flow with Local storage (easiest)](#flow-with-local-storage-easiest)
-    - [Flow with S3 Storage](#flow-with-s3-storage)
+    - [Flow with S3 Storage (recommended)](#flow-with-s3-storage-recommended)
     - [Flow with Docker storage](#flow-with-docker-storage)
       - [Preparing the Registry](#preparing-the-registry)
       - [Start the Docker in Docker agents](#start-the-docker-in-docker-agents)
       - [Registering the flow](#registering-the-flow)
 
+Interested about version **1.x** configuration ? Switch to the [last 1.x configuration branch](https://github.com/flavienbwk/prefect-docker-compose/tree/e758a498d5819550a9b926b0bf9bb4e9c85574d1).
+
 ## Run the server
 
-Open and edit the [`server/.env`](./server/.env) file.  
-All `PREFECT_SERVER_*` options are [explained in the official documentation](https://docs.prefect.io/core/concepts/configuration.html#environment-variables) and [listed in the `config.toml` file](https://github.com/PrefectHQ/prefect/blob/master/src/prefect/config.toml).
+1. Open and edit the [`server/.env`](./server/.env) file
 
-Then you can run :
+    :information_source: All `PREFECT_*` env variables can be [found in the Prefect settings.py file](https://github.com/PrefectHQ/prefect/blob/main/src/prefect/settings.py#L238).
 
-```bash
-docker-compose -f server/docker-compose.yml up -d
-```
+2. Start the server :
 
-Insert the following content in file `~/.prefect/config.toml` :
+    ```bash
+    cd server && docker-compose up --build -d && cd -
+    ```
 
-```conf
-# ~/.prefect/config.toml
-debug = true
-
-# base configuration directory (typically you won't change this!)
-home_dir = "~/.prefect"
-
-backend = "server"
-
-[server]
-host = "http://172.17.0.1"
-port = "4200"
-host_port = "4200"
-endpoint = "${server.host}:${server.port}"
-```
-
-Finally, we need to create a _tenant_. Execute on your host :
-
-```bash
-pip3 install prefect
-prefect backend server
-prefect server create-tenant --name default --slug default
-```
-
-Access the UI at [localhost:8080](http://localhost:8080)
+3. Access the Orion UI at [localhost:4200](http://localhost:4200)
 
 ## Run one or multiple agents
 
 Agents are services that run your scheduled flows.
 
-Open and edit the [`agent/config.toml`](./agent/config.toml) file.
+1. Open and edit the [`agent/docker-compose.yml`](./agent/docker-compose.yml) file.
 
-> :information_source: In each `config.toml`, you will find the `172.17.0.1` IP address. This is the IP of the Docker daemon on which are exposed all exposed ports of your containers. This allows containers launched from different docker-compose networks to communicate. Change it if yours is different (check your daemon IP by typing `ip a | grep docker0`).
-> 
-> ![Docker interface IP](./docker_interface.png)
-> 
-> Here, mine is `192.168.254.1` but the default is generally to `172.17.0.1`.
+    > :information_source: In each `docker-compose.yml`, you will find the `PREFECT_API_URL` env variable including the `172.17.0.1` IP address. This is the IP of the Docker daemon on which are exposed all exposed ports of your containers. This allows containers launched from different docker-compose networks to communicate. Change it if yours is different (check your daemon IP by typing `ip a | grep docker0`).
+    >
+    > ![Docker interface IP](./docker_interface.png)
+    >
+    > Here, mine is `192.168.254.1` but the default is generally to `172.17.0.1`.
 
-Then you can run :
+2. Start the agent :
 
-```bash
-docker-compose -f agent/docker-compose.yml up -d
-```
+    ```bash
+    docker-compose -f agent/docker-compose.yml up -d
+    ```
 
-> :information_source: You can run the agent on another machine than the one with the Prefect server. Edit the [`agent/config.toml`](./agent/config.toml) file for that.
+    > :information_source: You can run the agent on another machine than the one with the Prefect server. Edit the `PREFECT_API_URL` env variable for that.
 
-Maybe you want to instanciate multiple agents automatically ?
+    Maybe you want to instanciate multiple agents ?
 
-```bash
-docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
-```
+    ```bash
+    docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
+    ```
+
+3. Our agents are now starting listening the Orion server on the `flows-example-queue` queue ([see the `--work-queue` option](./agent/docker-compose.yml#L7)).
 
 ## Run your first flow via the Prefect API
 
@@ -91,11 +70,10 @@ docker-compose -f agent/docker-compose.yml up -d --scale agent=3 agent
 
 This means the Prefect server never stores your code. It just orchestrates the running (optionally the scheduling) of it.
 
-1. When coding a flow, you need first to [**register it** to the Prefect server](./client/weather.py#L50) through a script. In that script, you may ask the server to run your flow 3 times a day, for example.
+1. After developing your flow, Prefect will register it to the Orion server [through a Deployment](./client/weather.py#L53). In that script, you may ask the server to run your flow 3 times a day, for example.
 2. Your code never lies on the Prefect server : this means the code has to be stored somewhere accessible to the agents in order to be executed.
 
-    Prefect has [a lot of storage options](https://docs.prefect.io/orchestration/execution/storage_options.html) but the most famous are : Local, S3 and Docker.
-
+    Prefect has [a lot of storage options](https://docs.prefect.io/tutorials/storage) but the most famous are : Local, S3, Docker and git.
     - Local : saves the flows to be run on disk. So the volume where you save the flows must be [shared among your client and your agent(s)](./client/docker-compose.yml#L9). Requires your agent to have the same environment than your client (Python modules, packages installed etc... (the same Dockerfile if your agent and client are containers))
     - S3 : similar to local, but saves the flows to be run in S3 objects.
     - Docker : saves the flows to be run as Docker images to your Docker Registry so your agents can easily run the code.
@@ -104,15 +82,15 @@ This means the Prefect server never stores your code. It just orchestrates the r
 
 :information_source: If your agents are installed among multiple machines, I recommend you to mount a shared directory with SSHFS.
 
-Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance. Then you can run :
+1. Run the following command to register your deployment and run the flow :
 
-```bash
-docker-compose -f client/docker-compose.yml up # Executes weather.py
-```
+    ```bash
+    docker-compose -f client/docker-compose.yml up # Executes weather.py
+    ```
 
-Now your flow is registered. You can access the UI to run it.
+2. Access the UI to see your flow correctly run
 
-### Flow with S3 Storage
+### Flow with S3 Storage (recommended)
 
 :warning: I don't recommend this method if you plan to schedule a lot of flows every minute. MinIO times out regurarly in that case (maybe AWS wouldn't).
 
@@ -122,17 +100,19 @@ Now your flow is registered. You can access the UI to run it.
 
 We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 
-```bash
-docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
-```
+1. Start MinIO
 
-1. Go to [localhost:9000](http://localhost:9000) create a new **bucket** named `prefect` by clicking the red **(+)** button bottom right.
+    ```bash
+    docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
+    ```
 
-2. Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
+2. Go to [localhost:9000](http://localhost:9000) create a new **bucket** named `prefect` by clicking the red **(+)** button bottom right.
 
-  ```bash
-  docker-compose -f client_s3/docker-compose.yml up weather # Executes weather.py
-  ```
+3. Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
+
+    ```bash
+    docker-compose -f client_s3/docker-compose.yml up weather # Executes weather.py
+    ```
 
 Now your flow is registered. You can access the UI to run it.
 
@@ -153,36 +133,36 @@ A Docker Registry is needed in order to save images that are going to be used by
 
 2. Generate the authentication credentials for our registry
 
-  ```bash
-  sudo apt install apache2-utils # required to generate basic_auth credentials
-  cd client_docker/registry/auth && htpasswd -B -c .htpasswd myusername && cd -
-  ```
+    ```bash
+    sudo apt install apache2-utils # required to generate basic_auth credentials
+    cd client_docker/registry/auth && htpasswd -B -c .htpasswd myusername && cd -
+    ```
 
-  > To add more users, re-run the previous command **without** the -c option
+    > To add more users, re-run the previous command **without** the -c option
 
 3. Start the registry
 
-  ```bash
-  docker-compose -f client_docker/docker-compose.yml up -d registry
-  ```
+    ```bash
+    docker-compose -f client_docker/docker-compose.yml up -d registry
+    ```
 
 4. Login to the registry
 
-  You need to allow your Docker daemon to push to this registry. Insert this in your `/etc/docker/daemon.json` (create if needed) :
+    You need to allow your Docker daemon to push to this registry. Insert this in your `/etc/docker/daemon.json` (create if needed) :
 
-  ```json
-  {
-    "insecure-registries": ["172.17.0.1:5000"]
-  }
-  ```
+    ```json
+    {
+      "insecure-registries": ["172.17.0.1:5000"]
+    }
+    ```
 
-  Then, run :
+    Then, run :
 
-  ```bash
-  docker login http://172.17.0.1:5000 # with myusername and the password you typed
-  ```
+    ```bash
+    docker login http://172.17.0.1:5000 # with myusername and the password you typed
+    ```
 
-  You should see : _Login Succeeded_
+    You should see : _Login Succeeded_
 
 #### Start the Docker in Docker agents
 

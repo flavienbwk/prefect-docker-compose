@@ -2,12 +2,11 @@ version: "3.7"
 
 services:
 
-    agent:
-        build: .
-        command: bash -c "prefect agent local start --name $$(uuid) --no-hostname-label --label development"
-        volumes:
-            - /srv/docker/prefect/flows:/root/.prefect/flows
-            - type: bind
-              source: ./config.toml
-              target: /root/.prefect/config.toml
-              read_only: true
+  agent:
+    build: .
+    command: bash -c "prefect agent start --work-queue flows-example-queue"
+    environment:
+      PREFECT_API_URL: "http://172.17.0.1:4200/api"
+    volumes:
+      - /srv/docker/prefect/flows:/flows
+      - /srv/docker/prefect/flows:/root/.prefect/flows
