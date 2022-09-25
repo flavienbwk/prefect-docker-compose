@@ -81,12 +81,13 @@ def add_text_to_bucket(
 
 
 @flow(name="get_paris_weather_s3")
-def get_paris_weather():
-    artifacts_bucket_name = os.environ.get("MINIO_PREFECT_ARTIFACTS_BUCKET_NAME")
-    minio_endpoint = os.environ.get("MINIO_ENDPOINT")
-    minio_use_ssl = os.environ.get("MINIO_USE_SSL") == "true"
-    minio_access_key = os.environ.get("MINIO_ACCESS_KEY")
-    minio_secret_key = os.environ.get("MINIO_SECRET_KEY")
+def get_paris_weather(
+    minio_endpoint: str,
+    minio_access_key: str,
+    minio_secret_key: str,
+    minio_use_ssl: bool,
+    artifacts_bucket_name: str,
+):
     city_coordinates = get_city_coordinates("Paris")
     weather_content = get_weather(city_coordinates[0], city_coordinates[1])
     create_bucket(
@@ -136,12 +137,12 @@ if __name__ == "__main__":
         flow=get_paris_weather,
         storage=RemoteFileSystem.load("s3-storage"),
         work_queue_name="flows-example-queue",
-        infra_overrides={
-            "env.MINIO_ENDPOINT": minio_endpoint,
-            "env.MINIO_USE_SSL": minio_use_ssl,
-            "env.MINIO_ACCESS_KEY": minio_access_key,
-            "env.MINIO_SECRET_KEY": minio_secret_key,
-            "env.MINIO_PREFECT_ARTIFACTS_BUCKET_NAME": artifacts_bucket_name,
+        parameters={
+            "minio_endpoint": minio_endpoint,
+            "minio_access_key": minio_access_key,
+            "minio_secret_key": minio_secret_key,
+            "minio_use_ssl": minio_use_ssl,
+            "artifacts_bucket_name": artifacts_bucket_name,
         },
     )
     deployment.apply()
