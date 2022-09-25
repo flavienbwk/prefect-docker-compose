@@ -20,22 +20,16 @@ services:
     # the Dockerized script (`execution.Dockerfile`) in Prefect.
     weather:
         build: .
-        entrypoint: ["/bin/sh", "-c"]
-        command: 
-          - |
-            docker login -u=myusername -p=test http://172.17.0.1:5000
-            python3 /usr/app/weather.py
         privileged: true # forced for Docker DinD
+        environment:
+            PREFECT_API_URL: "http://172.17.0.1:4200/api"
+            REGISTRY_ENDPOINT: "172.17.0.1:5000"
+            REGISTRY_SCHEME: "http"
+            REGISTRY_USERNAME: myusername
+            REGISTRY_PASSWORD: test
         volumes:
-            - /srv/docker/prefect/flows:/root/.prefect/flows
-            - type: bind
-              source: ./weather.py
-              target: /usr/app/weather.py
-              read_only: true
-            - type: bind
-              source: ./config.toml
-              target: /root/.prefect/config.toml
-              read_only: true
+            - ./app:/usr/app:ro
+            - /srv/docker/prefect/flows:/opt/prefect/flows
             - type: bind
               source: /var/run/docker.sock
               target: /var/run/docker.sock

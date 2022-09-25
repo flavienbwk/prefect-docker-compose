@@ -169,7 +169,7 @@ A Docker Registry is needed in order to save images that are going to be used by
 Edit registry credentials in `./agent_docker/docker-compose.yml` and run :
 
 ```bash
-docker-compose -f agent_docker/docker-compose.yml up -d
+docker-compose -f agent_docker/docker-compose.yml up --build -d
 ```
 
 #### Registering the flow
@@ -178,23 +178,23 @@ We're going to push our Docker image with Python dependencies and register our f
 
 1. Build, tag and push the image
 
-  ```bash
-  docker build . -f ./client_docker/execution.Dockerfile -t 172.17.0.1:5000/weather/base_image
-  ```
+    ```bash
+    docker build . -f ./client_docker/execution.Dockerfile -t 172.17.0.1:5000/weather/base_image
+    ```
 
-  > You **must** prefix your image by the registry URI `172.17.0.1`
+    > You **must** prefix your image by the registry URI `172.17.0.1`
 
-  ```bash
-  docker push 172.17.0.1:5000/weather/base_image
-  ```
+    ```bash
+    docker push 172.17.0.1:5000/weather/base_image
+    ```
 
 2. Register the flow
 
-  Edit registry credentials in `./client_docker/docker-compose.yml` and run :
+    Edit registry credentials in `./client_docker/docker-compose.yml` and run :
 
-  ```bash
-  docker-compose -f ./client_docker/docker-compose.yml up weather
-  ```
+    ```bash
+    docker-compose -f ./client_docker/docker-compose.yml up --build weather
+    ```
 
 Now your flow is registered. You can access the UI to run it.
 
