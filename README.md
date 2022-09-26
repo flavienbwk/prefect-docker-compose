@@ -15,7 +15,7 @@ This allows you to package your Prefect instance for fully-containerized environ
     - [Flow with S3 Storage (recommended)](#flow-with-s3-storage-recommended)
     - [Flow with Docker storage](#flow-with-docker-storage)
       - [Preparing the Registry](#preparing-the-registry)
-      - [Start the Docker in Docker agents](#start-the-docker-in-docker-agents)
+      - [Start the Docker in Docker agent](#start-the-docker-in-docker-agent)
       - [Registering the flow](#registering-the-flow)
 
 Interested about version **1.x** configuration ? Switch to the [last 1.x configuration branch](https://github.com/flavienbwk/prefect-docker-compose/tree/e758a498d5819550a9b926b0bf9bb4e9c85574d1).
@@ -162,7 +162,7 @@ A Docker Registry is needed in order to save images that are going to be used by
 
     You should see : _Login Succeeded_
 
-#### Start the Docker in Docker agents
+#### Start the Docker in Docker agent
 
 Optionally edit registry credentials in [`./agent_docker/docker-compose.yml`](./agent_docker/docker-compose.yml) and run :
 
