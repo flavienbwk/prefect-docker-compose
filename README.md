@@ -106,9 +106,7 @@ We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
     docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
     ```
 
-2. Go to [localhost:9000](http://localhost:9000) create a new **bucket** named `prefect` by clicking the red **(+)** button bottom right.
-
-3. Register the flow :
+2. Register the flow :
 
     ```bash
     docker-compose -f client_s3/docker-compose.yml up weather # Executes weather.py
