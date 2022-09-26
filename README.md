@@ -1,6 +1,6 @@
 # Prefect - Docker Compose
 
-A simple guide to understand and make Prefect work with your own docker-compose configuration.
+A simple guide to understand and make Prefect 2.x work with your own docker-compose configuration.
 
 This allows you to package your Prefect instance for fully-containerized environments (e.g: docker-compose, Kubernetes) or offline use.
 
