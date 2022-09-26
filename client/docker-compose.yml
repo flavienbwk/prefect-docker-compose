@@ -2,16 +2,11 @@ version: "3.7"
 
 services:
 
-    weather:
-        build: .
-        command: python3 /usr/app/weather.py
-        volumes:
-            - /srv/docker/prefect/flows:/root/.prefect/flows
-            - type: bind
-              source: ./weather.py
-              target: /usr/app/weather.py
-              read_only: true
-            - type: bind
-              source: ./config.toml
-              target: /root/.prefect/config.toml
-              read_only: true
+  weather:
+    build: .
+    command: python3 /usr/app/weather.py
+    volumes:
+      - /srv/docker/prefect/flows:/flows
+      - ./app:/usr/app:ro
+    environment:
+      PREFECT_API_URL: "http://172.17.0.1:4200/api"
