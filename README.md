@@ -22,7 +22,7 @@ Interested about version **1.x** configuration ? Switch to the [last 1.x configu
 
 ## Run the server
 
-1. Open and edit the [`server/.env`](./server/.env) file
+1. Optionally open and edit the [`server/.env`](./server/.env) file
 
     :information_source: All `PREFECT_*` env variables can be [found in the Prefect settings.py file](https://github.com/PrefectHQ/prefect/blob/main/src/prefect/settings.py#L238).
 
@@ -38,7 +38,7 @@ Interested about version **1.x** configuration ? Switch to the [last 1.x configu
 
 Agents are services that run your scheduled flows.
 
-1. Open and edit the [`agent/docker-compose.yml`](./agent/docker-compose.yml) file.
+1. Optionally open and edit the [`agent/docker-compose.yml`](./agent/docker-compose.yml) file.
 
     > :information_source: In each `docker-compose.yml`, you will find the `PREFECT_API_URL` env variable including the `172.17.0.1` IP address. This is the IP of the Docker daemon on which are exposed all exposed ports of your containers. This allows containers launched from different docker-compose networks to communicate. Change it if yours is different (check your daemon IP by typing `ip a | grep docker0`).
     >
@@ -100,7 +100,7 @@ This means the Prefect server never stores your code. It just orchestrates the r
 
 We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 
-1. Start MinIO
+1. Optionally open and edit the [`client_s3/.env`](./client_s3/.env) file and start MinIO
 
     ```bash
     docker-compose -f client_s3/docker-compose.yml up -d minio # Starts MinIO
@@ -108,7 +108,7 @@ We will use [MinIO](https://www.github.com/minio/minio) as our S3 server.
 
 2. Go to [localhost:9000](http://localhost:9000) create a new **bucket** named `prefect` by clicking the red **(+)** button bottom right.
 
-3. Open the [`client/config.toml`](./client/config.toml) file and edit the IP to match your Prefect instance and S3 server endpoint. Then you can run :
+3. Register the flow :
 
     ```bash
     docker-compose -f client_s3/docker-compose.yml up weather # Executes weather.py
@@ -129,9 +129,7 @@ This method requires our client AND agent containers to have access to Docker so
 
 A Docker Registry is needed in order to save images that are going to be used by our agents.
 
-1. Open the [`client_docker/config.toml`](./client_docker/config.toml) [`client_docker/docker-compose.yml`](client_docker/docker-compose.yml) files and edit the IP to match your Prefect instance.
-
-2. Generate the authentication credentials for our registry
+1. Generate the authentication credentials for our registry
 
     ```bash
     sudo apt install apache2-utils # required to generate basic_auth credentials
@@ -140,13 +138,13 @@ A Docker Registry is needed in order to save images that are going to be used by
 
     > To add more users, re-run the previous command **without** the -c option
 
-3. Start the registry
+2. Start the registry
 
     ```bash
     docker-compose -f client_docker/docker-compose.yml up -d registry
     ```
 
-4. Login to the registry
+3. Login to the registry
 
     You need to allow your Docker daemon to push to this registry. Insert this in your `/etc/docker/daemon.json` (create if needed) :
 
@@ -156,7 +154,7 @@ A Docker Registry is needed in order to save images that are going to be used by
     }
     ```
 
-    Then, run :
+4. Start the registry
 
     ```bash
     docker login http://172.17.0.1:5000 # with myusername and the password you typed
@@ -166,7 +164,7 @@ A Docker Registry is needed in order to save images that are going to be used by
 
 #### Start the Docker in Docker agents
 
-Edit registry credentials in `./agent_docker/docker-compose.yml` and run :
+Optionally edit registry credentials in [`./agent_docker/docker-compose.yml`](./agent_docker/docker-compose.yml) and run :
 
 ```bash
 docker-compose -f agent_docker/docker-compose.yml up --build -d
@@ -190,7 +188,7 @@ We're going to push our Docker image with Python dependencies and register our f
 
 2. Register the flow
 
-    Edit registry credentials in `./client_docker/docker-compose.yml` and run :
+    Optionally edit registry credentials in `./client_docker/docker-compose.yml` and run :
 
     ```bash
     docker-compose -f ./client_docker/docker-compose.yml up --build weather
