@@ -17,7 +17,8 @@ services:
             REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
 
     # The script should have access to Docker in order to register
-    # the Dockerized script (`execution.Dockerfile`) in Prefect.
+    # the Dockerized script (`execution.Dockerfile`) in a 
+    # Docker image later used by the Prefect agent.
     weather:
         build: .
         privileged: true # forced for Docker DinD
@@ -29,7 +30,6 @@ services:
             REGISTRY_PASSWORD: test
         volumes:
             - ./app:/usr/app:ro
-            - /srv/docker/prefect/flows:/opt/prefect/flows
             - type: bind
               source: /var/run/docker.sock
               target: /var/run/docker.sock
@@ -39,3 +39,4 @@ services:
 
 volumes:
     registry_data:
+    flows_docker:

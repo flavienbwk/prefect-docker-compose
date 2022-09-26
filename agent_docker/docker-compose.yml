@@ -14,7 +14,6 @@ services:
     environment:
       PREFECT_API_URL: "http://172.17.0.1:4200/api"
     volumes:
-      - /srv/docker/prefect/flows:/opt/prefect/flows
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
