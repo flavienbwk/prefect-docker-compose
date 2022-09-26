@@ -1,6 +1,8 @@
 # Prefect - Docker Compose
 
-A simple guide to understand and make Prefect 2.x work with your own docker-compose configuration.
+A simple guide to understand and make Prefect **2.x** work with your own docker-compose configuration.
+
+Interested about version **1.x** configuration ? Switch to the [last 1.x configuration branch](https://github.com/flavienbwk/prefect-docker-compose/tree/e758a498d5819550a9b926b0bf9bb4e9c85574d1).
 
 This allows you to package your Prefect instance for fully-containerized environments (e.g: docker-compose, Kubernetes) or offline use.
 
@@ -17,8 +19,6 @@ This allows you to package your Prefect instance for fully-containerized environ
       - [Preparing the Registry](#preparing-the-registry)
       - [Start the Docker in Docker agent](#start-the-docker-in-docker-agent)
       - [Registering the flow](#registering-the-flow)
-
-Interested about version **1.x** configuration ? Switch to the [last 1.x configuration branch](https://github.com/flavienbwk/prefect-docker-compose/tree/e758a498d5819550a9b926b0bf9bb4e9c85574d1).
 
 ## Run the server
 
@@ -91,8 +91,6 @@ This means the Prefect server never stores your code. It just orchestrates the r
 2. Access the UI to see your flow correctly run
 
 ### Flow with S3 Storage (recommended)
-
-:warning: I don't recommend this method if you plan to schedule a lot of flows every minute. MinIO times out regurarly in that case (maybe AWS wouldn't).
 
 <details>
 <summary>Tutorial for S3 Storage</summary>
@@ -175,13 +173,13 @@ We're going to push our Docker image with Python dependencies and register our f
 1. Build, tag and push the image
 
     ```bash
-    docker build . -f ./client_docker/execution.Dockerfile -t 172.17.0.1:5000/weather/base_image
+    docker build . -f ./client_docker/execution.Dockerfile -t 172.17.0.1:5000/weather/base_image:latest
     ```
 
-    > You **must** prefix your image by the registry URI `172.17.0.1`
+    > You **must** prefix your image with the registry URI `172.17.0.1:5000` to push it
 
     ```bash
-    docker push 172.17.0.1:5000/weather/base_image
+    docker push 172.17.0.1:5000/weather/base_image:latest
     ```
 
 2. Register the flow
