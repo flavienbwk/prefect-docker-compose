@@ -52,7 +52,6 @@ def get_paris_weather():
 
 if __name__ == "__main__":
     from io import BytesIO
-
     from docker import APIClient
 
     flow_identifier = datetime.today().strftime("%Y%m%d%H%M%S-") + str(uuid.uuid4())
