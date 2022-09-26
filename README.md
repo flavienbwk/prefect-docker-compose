@@ -92,8 +92,6 @@ This means the Prefect server never stores your code. It just orchestrates the r
 
 ### Flow with S3 Storage (recommended)
 
-:warning: I don't recommend this method if you plan to schedule a lot of flows every minute. MinIO times out regurarly in that case (maybe AWS wouldn't).
-
 <details>
 <summary>Tutorial for S3 Storage</summary>
 <br/>
