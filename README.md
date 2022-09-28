@@ -2,7 +2,7 @@
 
 A simple guide to understand and make Prefect **2.x** work with your own docker-compose configuration.
 
-Interested about version **1.x** configuration ? Switch to the [last 1.x configuration branch](https://github.com/flavienbwk/prefect-docker-compose/tree/e758a498d5819550a9b926b0bf9bb4e9c85574d1).
+Interested in examples for Prefect **1.x** ? Switch to the [last 1.x branch of this repo](https://github.com/flavienbwk/prefect-docker-compose/tree/e758a498d5819550a9b926b0bf9bb4e9c85574d1).
 
 This allows you to package your Prefect instance for fully-containerized environments (e.g: docker-compose, Kubernetes) or offline use.
 
