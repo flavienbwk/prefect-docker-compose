@@ -70,7 +70,7 @@ Agents are services that run your scheduled flows.
 
 This means the Prefect server never stores your code. It just orchestrates the running (optionally the scheduling) of it.
 
-1. After developing your flow, Prefect will register it to the Orion server [through a Deployment](./client/weather.py#L53). In that script, you may ask the server to run your flow 3 times a day, for example.
+1. After developing your flow, Prefect will register it to the Orion server [through a Deployment](./client/app/weather.py#L49). In that script, you may ask the server to run your flow 3 times a day, for example.
 2. Your code never lies on the Prefect server : this means the code has to be stored somewhere accessible to the agents in order to be executed.
 
     Prefect has [a lot of storage options](https://docs.prefect.io/tutorials/storage) but the most famous are : Local, S3, Docker and git.
